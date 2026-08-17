@@ -35,7 +35,7 @@ pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemro
 "apa yang sedang kamu kerjakan":"apa_yang_sedang kamu_kerjakan",
 "hari ini tanggal berapa":"hari_ini_tanggal_berapa"}
 
-TOKEN="277352148:AAFWB-Z-gScmCA4B2fJYen2ryMNQ_b5dXrE"
+TOKEN="YOUR_TOKEN_HERE_WE_GO"
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 def get_url(url):
    response = internet.urlopen(url)
