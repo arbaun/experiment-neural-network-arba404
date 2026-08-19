@@ -9,7 +9,7 @@ import pickle
 import datetime
 model_tr= np.load("bobot_w.npz")
 w = model_tr["bobot"]
-#b = model_tr["bias"]
+b = model_tr["bias"]
 with open("kamus.pkl",'rb') as f:
      vocab = pickle.load(f)
 def generate_target(text, kamus, ukuran_kamus):
@@ -23,7 +23,7 @@ def generate_target(text, kamus, ukuran_kamus):
     return matrix_target
 pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemrograman",
 "favoritmu":"favorit_mu", "apa os yang":"apa_os_yang",
-"kamu pakai":"kamu_pakai", "kamu main":"kamu_main", "game apa":"game_apa",
+"kamu pakai":"kamu_pakai", "kamu main game apa":"kamu_main game_apa",
 "hewan apa yang":"hewan_apa_yang", "kamu suka":"kamu_suka",
 "jam berapa sekarang":"jam berapa_sekarang",
 "bagaimana cara install":"bagaimana_cara_install",
@@ -33,9 +33,12 @@ pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemro
 ,"sekarang jam berapa":"sekarang jam_berapa",
 "apa kelebihan":"apa_kelebihan","pisang atau anggur":"pisang_atau_anggur",
 "apa yang sedang kamu kerjakan":"apa_yang_sedang kamu_kerjakan",
-"hari ini tanggal berapa":"hari_ini_tanggal_berapa"}
+"hari ini tanggal berapa":"hari_ini_tanggal_berapa",
+"apa kekurangan":"apa_kekurangan", "hari ini hari apa":"hari_ini_hari_apa",
+"pepatah apa":"pepatah_apa", "kapan kamu main game":"kapan_kamu main_game",
+"apa fungsi kernel":"apa_fungsi kernel"}
 
-TOKEN="YOUR_TOKEN_HERE_WE_GO"
+TOKEN="YOUR_TOKEN_HERE"
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 def get_url(url):
    response = internet.urlopen(url)
@@ -54,7 +57,11 @@ def hitung_time():
 
 def hitung_tanggal():
     sekarang = datetime.datetime.now()
-    return sekarang.strftime("sekarang tanggal: %d-%m-%Y")
+    return sekarang.strftime("hari ini tanggal: %d-%m-%Y")
+
+def cari_hari():
+    sekarang = datetime.datetime.now()
+    return sekarang.strftime("hari ini hari %A")
 
 def tutorial_install_distro():
     return "Untuk install distro gnu/linux%0A 1.kamu harus mendownload file iso distro dari situs resmi distro. %0A 2.cek checksumnya valid atau tidak. %0A 3. buat bootable pakai rufus,balena etcher dll kalo fedora pakai fedora image writer. %0A 4. jalankan bootable dan ikutin petunjuk dari distronya."
@@ -128,7 +135,7 @@ def tanggap(updates):
           for kata_asli, kata_gabung in pencegat.items():
               text_bersih = text_bersih.replace(kata_asli, kata_gabung)
           x_per = generate_target(text_bersih, vocab, len(vocab))
-          prob_pre = np.dot(x_per,w)
+          prob_pre = np.dot(x_per,w)+b
           index_resp = np.argmax(prob_pre, axis=-1)
           kata_kata =[]
           for v in index_resp:
@@ -138,7 +145,8 @@ def tanggap(updates):
           router_aks = {"sekarang jam_aksi":hitung_time,
           "tutorial_install distro gnu/linux":tutorial_install_distro,
           "sekarang tanya_waktu":hitung_time,
-           "tanya_tanggal":hitung_tanggal}
+           "tanya_tanggal":hitung_tanggal,
+           "tanya_hari":cari_hari}
           hasil_prediksi = " ".join(kata_kata)
           if hasil_prediksi in router_aks:
              balasan = router_aks[hasil_prediksi]()

@@ -18,7 +18,7 @@ text_p = input("masukkan pertanyaan atau pernyataan yang akan direspon komputer:
 text_bersih = text_p.lower().replace("?","")
 pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemrograman",
 "favoritmu":"favorit_mu", "apa os yang":"apa_os_yang",
-"kamu pakai":"kamu_pakai", "kamu main":"kamu_main", "game apa":"game_apa",
+"kamu pakai":"kamu_pakai", "kamu main game apa":"kamu_main game_apa",
 "hewan apa yang":"hewan_apa_yang", "kamu suka":"kamu_suka",
 "jam berapa sekarang":"jam berapa_sekarang",
 "bagaimana cara install":"bagaimana_cara_install",
@@ -28,19 +28,23 @@ pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemro
 ,"sekarang jam berapa":"sekarang jam_berapa",
 "apa kelebihan":"apa_kelebihan","pisang atau anggur":"pisang_atau_anggur",
 "apa yang sedang kamu kerjakan":"apa_yang_sedang kamu_kerjakan",
-"hari ini tanggal berapa":"hari_ini_tanggal_berapa"}
+"hari ini tanggal berapa":"hari_ini_tanggal_berapa",
+"apa kekurangan":"apa_kekurangan", "hari ini hari apa":"hari_ini_hari_apa",
+"pepatah apa":"pepatah_apa",
+"kapan kamu main game":"kapan_kamu main_game",
+"apa fungsi kernel":"apa_fungsi kernel"}
 for kata_asli, kata_gabung in pencegat.items():
     text_bersih = text_bersih.replace(kata_asli, kata_gabung)
 x_per = generate_target(text_bersih, vocab, len(vocab))
 print(x_per)
-prob_pre = np.dot(x_per,w)
-#print(prob_pre)
+prob_pre = np.dot(x_per,w)+b 
+print(prob_pre)
 index_resp = np.argmax(prob_pre, axis=-1)
-#print(index_resp)
+print(index_resp)
 kata_kata =[]
 for v in index_resp:
     for k,v1 in vocab.items():
         if v1== v:
            kata_kata.append(k)
-
+print(" ".join(kata_kata[:2]))
 print(" ".join(kata_kata).replace("_"," "))

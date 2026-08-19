@@ -1,6 +1,7 @@
 from collections import defaultdict
 import numpy as np
 import pickle
+import matplotlib.pyplot as plt
 #corpus embed buat test
 corpus = ["saya suka Fedora GNU/Linux", "kamu benci install freebsd","saya membeli laptop baru","Hari ini cuaca cerah","Hari ini hujan"
 ,"dia membeli buku","python bahasa pemrograman keren",
@@ -22,7 +23,12 @@ corpus = ["saya suka Fedora GNU/Linux", "kamu benci install freebsd","saya membe
 "mengapa_pakai categorical cross entropy karena_secara desain lebik_cocok buat_generatif_text",
 "kenapa_kucing_punya kumis karena_untuk mengukur_jarak_suatu_celah_supaya_pas_sama_tubuhnya",
 "jam_berapa tanya_waktu anggur pisang mangga ","apa_yang_sedang kamu_kerjakan",
-"pisang_atau_anggur apa_kelebihan linuxmint lebih_mudah bagi_pemula hari_ini_tanggal_berapa tanya_tanggal"]
+"pisang_atau_anggur apa_kelebihan linuxmint lebih_mudah bagi_pemula hari_ini_tanggal_berapa tanya_tanggal",
+"apa_kekurangan banyak, salah_satunya_GIL_Global_Interpreter_Lock. namun_fitur_dictionary-nya membuat_sulit_meninggalkan-nya",
+"hari_ini_hari_apa tanya_hari kapan_kamu setiap_aku_bosan pasti_main_game main_game bosan pasti pepatah_apa yang ingat",
+"fungsi apa_fungsi",
+"software yang_menghubungkan_sistem_operasi_ke_hardware_yang_ada_di_komputer_dan_juga_peripheralnya_tapi,_harus_ada_kernel_modul_untuk_mengenali_perangkat."
+]
 #kamus vocab pakai defaultdict
 vocab = defaultdict(lambda: len(vocab))
 kernel = np.array([[1,0,-1,0],
@@ -80,7 +86,7 @@ def backward(x, y_true, y_pred,z, w, b, learning_rate=0.01):
     grad_loss = (y_pred - y_true)/x.shape[0]
     grad_activation = grad_loss *(z>0)
     grad_w = np.dot(x.T, grad_activation)
-    grad_b = np.sum(grad_activation, axis=0,keepdims=True)
+    grad_b = np.sum(grad_activation)
     w_updated = w -(learning_rate * grad_w)
     b_updated = b -(learning_rate * grad_b)
     return w_updated, b_updated
@@ -136,7 +142,13 @@ data_pj = [(kalimat_baru,text_expec),(p_tanya,te_jawaban),
 ("kenapa_kucing_punya kumis","karena_untuk mengukur_jarak_suatu_celah_supaya_pas_sama_tubuhnya"),
 ("sekarang jam_berapa","sekarang tanya_waktu"),("apa_kelebihan linuxmint","lebih_mudah bagi_pemula"),
 ("pisang_atau_anggur","anggur"),("apa_yang_sedang kamu_kerjakan","aku_sendang_berusaha membuat_text_generatif"),
-("hari_ini_tanggal_berapa","tanya_tanggal")]
+("hari_ini_tanggal_berapa","tanya_tanggal"),
+("apa_kekurangan bahasa pemrograman python",
+"banyak, salah_satunya_GIL_Global_Interpreter_Lock. namun_fitur_dictionary-nya membuat_sulit_meninggalkan-nya"),
+("hari_ini_hari_apa","tanya_hari"),("kapan_kamu main_game","setiap_aku_bosan pasti_main_game "),
+("pepatah_apa yang kamu ingat","sedia payung sebelum hujan"),
+("apa_fungsi kernel","software yang_menghubungkan_sistem_operasi_ke_hardware_yang_ada_di_komputer_dan_juga_peripheralnya_tapi,_harus_ada_kernel_modul_untuk_mengenali_perangkat.")
+]
 #pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemrograman",
 #"favoritmu":"favorit_mu", "apa os yang":"apa_os_yang",
 #"kamu pakai":"kamu_pakai", "kamu main":"kamu_main", "game apa":"game_apa",
@@ -144,7 +156,8 @@ data_pj = [(kalimat_baru,text_expec),(p_tanya,te_jawaban),
 #"berapa sekarang":"berapa_sekarang"}
 #print(w)
 #print(y_target)
-for epoch in range(1000):
+data_loss = []
+for epoch in range(10000):
     #np.random.shuffle(data_pj)
     for tanya, response in data_pj:
         ex_train= generate_target(tanya, dict(vocab), total_vocab_size)
@@ -152,6 +165,7 @@ for epoch in range(1000):
         z, y_pred = forward(ex_train, w,b)
         loss = compute_loss(y_pred, y_true)
         w,b = backward(ex_train, y_true, y_pred, z, w, b, learning_rate=0.01)
+        data_loss.append(loss)
 
     #if epoch % 20 == 0:
        #print(f"Epoch {epoch}, Loss: {loss:.4f}")
@@ -160,7 +174,14 @@ for epoch in range(1000):
 np.savez("bobot_w.npz", bobot=w,bias=b)
 with open("kamus.pkl",'wb') as f:
      pickle.dump(dict(vocab),f)
-
+plt.figure(figsize=(8,4))
+plt.plot(data_loss, label="training loss", color="orangered",linewidth=2)
+plt.title("kurva loss",fontsize=12,fontweight="bold")
+plt.xlabel("epoch")
+plt.ylabel("loss")
+plt.grid(True, linestyle='--',alpha=0.6)
+plt.legend()
+plt.show()
 rock = np.dot(ex_train,w)
 #print(rock)
 probs = softmax(rock)
