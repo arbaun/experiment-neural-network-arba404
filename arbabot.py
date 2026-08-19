@@ -36,7 +36,10 @@ pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemro
 "hari ini tanggal berapa":"hari_ini_tanggal_berapa",
 "apa kekurangan":"apa_kekurangan", "hari ini hari apa":"hari_ini_hari_apa",
 "pepatah apa":"pepatah_apa", "kapan kamu main game":"kapan_kamu main_game",
-"apa fungsi kernel":"apa_fungsi kernel"}
+"apa fungsi kernel":"apa_fungsi kernel",
+"besok hari apa":"besok_hari_apa",
+"lusa hari apa":"lusa_hari_apa",
+"apa kabar":"apa_kabar"}
 
 TOKEN="YOUR_TOKEN_HERE"
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
@@ -60,8 +63,35 @@ def hitung_tanggal():
     return sekarang.strftime("hari ini tanggal: %d-%m-%Y")
 
 def cari_hari():
+    hari_indo={"Monday":"Senin",
+     "Tuesday":"Selasa",
+     "Wednesday":"Rabu",
+     "Thursday":"Kamis",
+     "Friday":"Jumat",
+     "Saturday":"Sabtu",
+     "Sunday":"Ahad"}
     sekarang = datetime.datetime.now()
-    return sekarang.strftime("hari ini hari %A")
+    return "hari ini hari "+hari_indo[sekarang.strftime("%A")]
+def cari_besok():
+    hari_indo={"Monday":"Senin",
+     "Tuesday":"Selasa",
+     "Wednesday":"Rabu",
+     "Thursday":"Kamis",
+     "Friday":"Jumat",
+     "Saturday":"Sabtu",
+     "Sunday":"Ahad"}
+    besok = datetime.datetime.now()+datetime.timedelta(days=1)
+    return "besok hari "+hari_indo[besok.strftime("%A")]
+def cari_lusa():
+    hari_indo={"Monday":"Senin",
+     "Tuesday":"Selasa",
+     "Wednesday":"Rabu",
+     "Thursday":"Kamis",
+     "Friday":"Jumat",
+     "Saturday":"Sabtu",
+     "Sunday":"Ahad"}
+    lusa = datetime.datetime.now()+ datetime.timedelta(days=2)
+    return "lusa hari "+hari_indo[lusa.strftime("%A")]
 
 def tutorial_install_distro():
     return "Untuk install distro gnu/linux%0A 1.kamu harus mendownload file iso distro dari situs resmi distro. %0A 2.cek checksumnya valid atau tidak. %0A 3. buat bootable pakai rufus,balena etcher dll kalo fedora pakai fedora image writer. %0A 4. jalankan bootable dan ikutin petunjuk dari distronya."
@@ -146,7 +176,9 @@ def tanggap(updates):
           "tutorial_install distro gnu/linux":tutorial_install_distro,
           "sekarang tanya_waktu":hitung_time,
            "tanya_tanggal":hitung_tanggal,
-           "tanya_hari":cari_hari}
+           "tanya_hari":cari_hari,
+           "tanya_besok":cari_besok,
+           "tanya_lusa":cari_lusa}
           hasil_prediksi = " ".join(kata_kata)
           if hasil_prediksi in router_aks:
              balasan = router_aks[hasil_prediksi]()

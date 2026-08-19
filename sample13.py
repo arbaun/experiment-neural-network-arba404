@@ -28,7 +28,7 @@ corpus = ["saya suka Fedora GNU/Linux", "kamu benci install freebsd","saya membe
 "hari_ini_hari_apa tanya_hari kapan_kamu setiap_aku_bosan pasti_main_game main_game bosan pasti pepatah_apa yang ingat",
 "fungsi apa_fungsi",
 "software yang_menghubungkan_sistem_operasi_ke_hardware_yang_ada_di_komputer_dan_juga_peripheralnya_tapi,_harus_ada_kernel_modul_untuk_mengenali_perangkat."
-]
+,"besok_hari_apa lusa_hari_apa tanya_besok tanya_lusa apa_kabar baik"]
 #kamus vocab pakai defaultdict
 vocab = defaultdict(lambda: len(vocab))
 kernel = np.array([[1,0,-1,0],
@@ -77,8 +77,8 @@ def softmax(x):
     exp_x = np.exp(x - np.max(x,axis=-1, keepdims=True))
     return exp_x / np.sum(exp_x,axis=-1, keepdims=True)
 def forward(x,w,b):
-    z = np.dot(x,w)
-    out = softmax(z)
+    z = np.dot(x,w)+b
+    out =np.maximum(0,softmax(z))
     return softmax(z), out
 def compute_loss(y_pred, y_true):
     return -np.mean(np.sum(y_true * np.log(y_pred + 1e-9),axis=-1))
@@ -148,7 +148,7 @@ data_pj = [(kalimat_baru,text_expec),(p_tanya,te_jawaban),
 ("hari_ini_hari_apa","tanya_hari"),("kapan_kamu main_game","setiap_aku_bosan pasti_main_game "),
 ("pepatah_apa yang kamu ingat","sedia payung sebelum hujan"),
 ("apa_fungsi kernel","software yang_menghubungkan_sistem_operasi_ke_hardware_yang_ada_di_komputer_dan_juga_peripheralnya_tapi,_harus_ada_kernel_modul_untuk_mengenali_perangkat.")
-]
+,("besok_hari_apa","tanya_besok"),("lusa_hari_apa","tanya_lusa"),("apa_kabar","baik")]
 #pencegat = {"siapa yang":"siapa_yang","apa bahasa pemrograman":"apa_bahasa_pemrograman",
 #"favoritmu":"favorit_mu", "apa os yang":"apa_os_yang",
 #"kamu pakai":"kamu_pakai", "kamu main":"kamu_main", "game apa":"game_apa",
@@ -171,7 +171,7 @@ for epoch in range(10000):
        #print(f"Epoch {epoch}, Loss: {loss:.4f}")
      #  if epoch==980:
      #     prediksi_probs = y_pred
-np.savez("bobot_w.npz", bobot=w,bias=b)
+np.savez_compressed("bobot_w.npz", bobot=w,bias=b)
 with open("kamus.pkl",'wb') as f:
      pickle.dump(dict(vocab),f)
 plt.figure(figsize=(8,4))
@@ -182,7 +182,7 @@ plt.ylabel("loss")
 plt.grid(True, linestyle='--',alpha=0.6)
 plt.legend()
 plt.show()
-rock = np.dot(ex_train,w)
+rock = np.dot(ex_train,w)+b
 #print(rock)
 probs = softmax(rock)
 #print(probs)
